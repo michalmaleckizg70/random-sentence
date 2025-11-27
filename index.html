@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netlify Random Text Generator</title>
-    <!-- Load Tailwind CSS for easy, clean styling -->
+    <title>Automatyczny Generator Losowego Tekstu</title>
+    <!-- Ładowanie Tailwind CSS do łatwego i czystego stylowania -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom font for a clean, modern look */
+        /* Własna czcionka dla nowoczesnego wyglądu */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
@@ -18,65 +18,56 @@
 
     <div class="max-w-xl w-full bg-white p-8 sm:p-12 rounded-xl shadow-2xl text-center">
         <h1 class="text-4xl font-bold text-gray-800 mb-6">
-            Word Generator
+            Automatyczny Generator Słów
         </h1>
         
-        <!-- Display area for the word -->
+        <!-- Obszar wyświetlania słowa, początkowo ustawiony na "Ładowanie..." -->
         <div id="word-display" 
              class="min-h-[4rem] text-5xl sm:text-7xl font-extrabold text-indigo-600 
-                    my-10 transition-transform duration-300 ease-out transform scale-100 
-                    hover:scale-105 select-text">
-            ...
+                    my-10 transition-transform duration-300 ease-out select-text">
+            Ładowanie...
         </div>
 
-
-        <p id="status-message" class="mt-4 text-sm text-gray-500"></p>
+        <p id="status-message" class="mt-4 text-sm text-gray-500">Słowo jest generowane automatycznie przy ładowaniu strony.</p>
     </div>
 
     <script>
         const display = document.getElementById('word-display');
-        const button = document.getElementById('word-button');
-        const statusMessage = document.getElementById('status-message');
         
-        // Initial setup
-        display.innerText = "Click to Start2";
-
         /**
-         * Fetches a random word from the Netlify Serverless Function.
+         * Pobiera losowe słowo z funkcji Netlify Serverless.
          */
         async function fetchWord() {
-            // Disable button and show loading state
-            button.disabled = true;
-            statusMessage.innerText = "Loading...";
+            // Dodanie efektu ładowania (rozmycie i przyciemnienie)
             display.classList.add('opacity-50', 'blur-sm');
 
-            // FIX: Removed the leading slash from the functionUrl to prevent the URL parsing error 
-            // in non-standard preview environments.
+            // Prawidłowa ścieżka względna do funkcji Netlify
             const functionUrl = '.netlify/functions/random-word';
 
             try {
+                // Wywołanie funkcji
                 const response = await fetch(functionUrl);
                 const data = await response.json();
                 
                 if (response.ok && data.word) {
                     display.innerText = data.word;
-                    statusMessage.innerText = "Success! The word was generated server-side.";
                 } else {
-                    display.innerText = "Error!";
-                    statusMessage.innerText = `Error: ${data.error || 'Could not fetch data.'}`;
+                    display.innerText = "Błąd!";
+                    console.error("Błąd funkcji:", data.error || 'Nie udało się pobrać danych.');
                 }
 
             } catch (error) {
-                console.error("Fetch Error:", error);
-                display.innerText = "Network Error!";
-                statusMessage.innerText = "A network error occurred. Check the console.";
+                console.error("Błąd pobierania:", error);
+                display.innerText = "Błąd sieci!";
             } finally {
-                // Re-enable button and reset display
-                button.disabled = false;
+                // Usunięcie efektu ładowania
                 display.classList.remove('opacity-50', 'blur-sm');
             }
         }
-	window.onload = fetchWord();
+
+        // --- Wykonanie natychmiast po załadowaniu strony ---
+        // Uruchomienie funkcji pobierającej słowo natychmiast po załadowaniu wszystkich elementów strony.
+        window.onload = fetchWord;
     </script>
 </body>
 </html>
