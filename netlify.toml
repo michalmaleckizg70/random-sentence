@@ -1,0 +1,11 @@
+[build]
+
+The directory where Netlify will find your static files (index.html)
+
+publish = "."
+
+[functions]
+
+The directory where Netlify will look for your function files
+
+directory = "functions"
