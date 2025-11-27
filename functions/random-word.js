@@ -5,7 +5,7 @@
 
 // A simple dictionary data source
 const DICTIONARY = [
-    "Dziwne u mnie działa :)", "Nie proście, a piwo będzie Wam dane", "Nigdy nie wywołuj BIOS-a na daremno", "Piękna barka da Ci piwo", "Poszukaj w dokumentacji", "Piwo w barze", "Plik nie został znaleziony, ale jest wiele innych ;)"
+    "Małe piwko z korzeniami", "Dziwne u mnie działa :)", "Nie proście, a piwo będzie Wam dane", "Nigdy nie wywołuj BIOS-a na daremno", "Piękna barka da Ci piwo", "Poszukaj w dokumentacji", "Piwo w barze", "Plik nie został znaleziony, ale jest wiele innych ;)", "Gęba się śmieje, gdy piwo się leje", "Test, testy i bug!", "Kto piwo pije ten długo żyje", "Mądry Polak po errorze", "Kto pije piwo, ten chodzi krzywo", "Nigdy nie ufaj komputerowi, którego nie możesz wyrzucić przez okno"
 ];
 
 exports.handler = async function(event, context) {
