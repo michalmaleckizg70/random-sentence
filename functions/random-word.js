@@ -5,7 +5,7 @@
 
 // A simple dictionary data source
 const DICTIONARY = [
-    "Dziwne u mnie działa :)", "Nigdy nie wywołuj BIOS-a na daremno"
+    "Dziwne u mnie działa :)", "PIWO", "Nigdy nie wywołuj BIOS-a na daremno", "PIWO", "Poszukaj w dokumentacji", "PIWO", "Plik nie został znaleziony, ale jest wiele innych ;)"
 ];
 
 exports.handler = async function(event, context) {
