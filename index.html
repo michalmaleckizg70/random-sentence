@@ -29,13 +29,6 @@
             ...
         </div>
 
-        <!-- Action Button -->
-        <button onclick="fetchWord()" id="word-button"
-                class="w-full sm:w-auto px-10 py-4 bg-indigo-600 text-white font-semibold 
-                       rounded-full shadow-lg hover:bg-indigo-700 transition duration-150 
-                       ease-in-out transform hover:-translate-y-0.5 disabled:opacity-50">
-            Generate Random Word
-        </button>
 
         <p id="status-message" class="mt-4 text-sm text-gray-500"></p>
     </div>
@@ -83,6 +76,7 @@
                 display.classList.remove('opacity-50', 'blur-sm');
             }
         }
+	window.onload = fetchWord;
     </script>
 </body>
 </html>
