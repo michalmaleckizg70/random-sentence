@@ -5,10 +5,7 @@
 
 // A simple dictionary data source
 const DICTIONARY = [
-    "Epiphany", "Serendipity", "Luminous", "Mellifluous", 
-    "Quixotic", "Petrichor", "Ineffable", "Aurora", 
-    "Sonorous", "Ethereal", "Vellichor", "Solitude",
-    "Liminal", "Hiraeth", "Nefarious", "Wanderlust"
+    "Dziwne u mnie działa :)", "Nigdy nie wywołuj BIOS-a na daremno"
 ];
 
 exports.handler = async function(event, context) {
