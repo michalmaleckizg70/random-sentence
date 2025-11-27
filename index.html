@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netlify Random Text Generator</title>
+    <!-- Load Tailwind CSS for easy, clean styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font for a clean, modern look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
+
+    <div class="max-w-xl w-full bg-white p-8 sm:p-12 rounded-xl shadow-2xl text-center">
+        <h1 class="text-4xl font-bold text-gray-800 mb-6">
+            Word Generator
+        </h1>
+        
+        <!-- Display area for the word -->
+        <div id="word-display" 
+             class="min-h-[4rem] text-5xl sm:text-7xl font-extrabold text-indigo-600 
+                    my-10 transition-transform duration-300 ease-out transform scale-100 
+                    hover:scale-105 select-text">
+            ...
+        </div>
+
+        <!-- Action Button -->
+        <button onclick="fetchWord()" id="word-button"
+                class="w-full sm:w-auto px-10 py-4 bg-indigo-600 text-white font-semibold 
+                       rounded-full shadow-lg hover:bg-indigo-700 transition duration-150 
+                       ease-in-out transform hover:-translate-y-0.5 disabled:opacity-50">
+            Generate Random Word
+        </button>
+
+        <p id="status-message" class="mt-4 text-sm text-gray-500"></p>
+    </div>
+
+    <script>
+        const display = document.getElementById('word-display');
+        const button = document.getElementById('word-button');
+        const statusMessage = document.getElementById('status-message');
+        
+        // Initial setup
+        display.innerText = "Click to Start";
+
+        /**
+         * Fetches a random word from the Netlify Serverless Function.
+         */
+        async function fetchWord() {
+            // Disable button and show loading state
+            button.disabled = true;
+            statusMessage.innerText = "Loading...";
+            display.classList.add('opacity-50', 'blur-sm');
+
+            // FIX: Removed the leading slash from the functionUrl to prevent the URL parsing error 
+            // in non-standard preview environments.
+            const functionUrl = '.netlify/functions/random-word';
+
+            try {
+                const response = await fetch(functionUrl);
+                const data = await response.json();
+                
+                if (response.ok && data.word) {
+                    display.innerText = data.word;
+                    statusMessage.innerText = "Success! The word was generated server-side.";
+                } else {
+                    display.innerText = "Error!";
+                    statusMessage.innerText = `Error: ${data.error || 'Could not fetch data.'}`;
+                }
+
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                display.innerText = "Network Error!";
+                statusMessage.innerText = "A network error occurred. Check the console.";
+            } finally {
+                // Re-enable button and reset display
+                button.disabled = false;
+                display.classList.remove('opacity-50', 'blur-sm');
+            }
+        }
+    </script>
+</body>
+</html>
