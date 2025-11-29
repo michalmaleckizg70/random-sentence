@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentencja na wieczór</title>
+    <title>Automatyczny Generator Losowej Frazy - Unikalne Frazy</title>
     <!-- Ładowanie Tailwind CSS do łatwego i czystego stylowania -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Własna czcionka dla nowoczesnego wyglądu */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -17,57 +17,134 @@
 <body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
 
     <div class="max-w-xl w-full bg-white p-8 sm:p-12 rounded-xl shadow-2xl text-center">
-        <h1 class="text-4xl font-bold text-gray-800 mb-6">
-            Oto i sentencja na nasz wieczór
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">
+            Losowa Mądrość Piwna (Unikalny Cykl)
         </h1>
         
-        <!-- Obszar wyświetlania słowa, początkowo ustawiony na "Ładowanie..." -->
+        <!-- Obszar wyświetlania frazy -->
         <div id="word-display" 
-             class="min-h-[4rem] text-5xl sm:text-7xl font-extrabold text-indigo-600 
-                    my-10 transition-transform duration-300 ease-out select-text">
+             class="min-h-[4rem] text-3xl sm:text-4xl font-extrabold text-indigo-600 
+                    my-10 transition-transform duration-300 ease-out select-text leading-tight px-2">
             Ładowanie...
         </div>
 
-        <p id="status-message" class="mt-4 text-sm text-gray-500">AI pomogło...</p>
+        <p id="status-message" class="mt-4 text-sm text-gray-500">
+            Fraza jest generowana automatycznie po załadowaniu. Każda fraza jest unikalna w jednym cyklu.
+        </p>
+        
+        <!-- Usunięty Przycisk Resetowania -->
     </div>
 
     <script>
+        // Klucz do przechowywania listy wyświetlonych fraz w pamięci lokalnej przeglądarki
+        const STORAGE_KEY = 'displayedPhrases'; 
         const display = document.getElementById('word-display');
         
+        // Pełna lista fraz pobierana z backendu
+        let allPhrases = []; 
+
         /**
-         * Pobiera losowe słowo z funkcji Netlify Serverless.
+         * Zapisuje bieżącą listę wyświetlonych fraz w localStorage.
+         * @param {string[]} displayedList Lista fraz, które zostały już pokazane.
          */
-        async function fetchWord() {
-            // Dodanie efektu ładowania (rozmycie i przyciemnienie)
-            display.classList.add('opacity-50', 'blur-sm');
-
-            // Prawidłowa ścieżka względna do funkcji Netlify
-            const functionUrl = '.netlify/functions/random-word';
-
+        function saveDisplayedPhrases(displayedList) {
             try {
-                // Wywołanie funkcji
-                const response = await fetch(functionUrl);
-                const data = await response.json();
-                
-                if (response.ok && data.word) {
-                    display.innerText = data.word;
-                } else {
-                    display.innerText = "Błąd!";
-                    console.error("Błąd funkcji:", data.error || 'Nie udało się pobrać danych.');
-                }
-
-            } catch (error) {
-                console.error("Błąd pobierania:", error);
-                display.innerText = "Błąd sieci!";
-            } finally {
-                // Usunięcie efektu ładowania
-                display.classList.remove('opacity-50', 'blur-sm');
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(displayedList));
+            } catch (e) {
+                console.error("Błąd zapisu w localStorage:", e);
             }
         }
 
-        // --- Wykonanie natychmiast po załadowaniu strony ---
-        // Uruchomienie funkcji pobierającej słowo natychmiast po załadowaniu wszystkich elementów strony.
-        window.onload = fetchWord;
+        /**
+         * Pobiera listę wyświetlonych fraz z localStorage.
+         * @returns {string[]} Lista wyświetlonych fraz.
+         */
+        function loadDisplayedPhrases() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                return stored ? JSON.parse(stored) : [];
+            } catch (e) {
+                console.error("Błąd odczytu z localStorage:", e);
+                return [];
+            }
+        }
+        
+        /**
+         * Pobiera całą listę fraz, losuje nową, unikalną frazę, 
+         * aktualizuje stan i wyświetla frazę.
+         */
+        async function fetchAndDisplayUniquePhrase() {
+            display.classList.add('opacity-50', 'blur-sm');
+
+            // 1. Pobierz pełną listę fraz (jeśli jeszcze nie została pobrana)
+            if (allPhrases.length === 0) {
+                const functionUrl = '.netlify/functions/random-phrase';
+                try {
+                    const response = await fetch(functionUrl);
+                    const data = await response.json();
+                    
+                    if (!response.ok || !data.phrases || data.phrases.length === 0) {
+                        display.innerText = "Błąd: Nie można pobrać listy fraz.";
+                        console.error("Błąd backendu:", data.error || 'Lista fraz jest pusta.');
+                        return;
+                    }
+                    allPhrases = data.phrases;
+                } catch (error) {
+                    console.error("Błąd pobierania z API:", error);
+                    display.innerText = "Błąd sieci lub API!";
+                    return;
+                }
+            }
+
+            // 2. Wczytaj stan
+            let displayedPhrases = loadDisplayedPhrases();
+            
+            // 3. Znajdź dostępne frazy (które nie zostały jeszcze wyświetlone)
+            const availablePhrases = allPhrases.filter(phrase => 
+                !displayedPhrases.includes(phrase)
+            );
+
+            let phraseToDisplay;
+            let statusText = "Fraza jest generowana automatycznie po załadowaniu. Każda fraza jest unikalna w jednym cyklu.";
+
+            // 4. Losowanie lub Reset
+            if (availablePhrases.length > 0) {
+                // Mamy dostępne frazy, losujemy jedną
+                const randomIndex = Math.floor(Math.random() * availablePhrases.length);
+                phraseToDisplay = availablePhrases[randomIndex];
+                
+                // Dodaj nową frazę do listy wyświetlonych
+                displayedPhrases.push(phraseToDisplay);
+                saveDisplayedPhrases(displayedPhrases);
+                
+                statusText = `Wyświetlono fraz: ${displayedPhrases.length} z ${allPhrases.length}.`;
+            } else {
+                // Wyświetlono wszystkie frazy - RESET
+                
+                // Losujemy pierwszą frazę na nowy cykl
+                const randomIndex = Math.floor(Math.random() * allPhrases.length);
+                phraseToDisplay = allPhrases[randomIndex]; 
+                
+                // RESETUJ STAN: Ustawiamy nową frazę jako jedyną wyświetloną w nowym cyklu
+                saveDisplayedPhrases([phraseToDisplay]);
+                
+                statusText = `Cykl zakończony. Rozpoczyna się nowy cykl! Wyświetlono: 1 z ${allPhrases.length}.`;
+                
+                // Wyróżnij komunikat o nowym cyklu
+                document.getElementById('status-message').innerHTML = `<span class="text-lg font-bold text-green-700">NOWY CYKL!</span> ${statusText}`;
+            }
+
+            // 5. Wyświetl wynik i usuń ładowanie
+            display.innerText = phraseToDisplay;
+            // Aktualizacja statusu, jeśli nie został zmieniony w bloku resetowania
+            if (!document.getElementById('status-message').innerHTML.includes("NOWY CYKL")) {
+                document.getElementById('status-message').innerText = statusText;
+            }
+            display.classList.remove('opacity-50', 'blur-sm');
+        }
+        
+        // Uruchomienie głównej funkcji po załadowaniu strony
+        window.onload = fetchAndDisplayUniquePhrase;
     </script>
 </body>
 </html>
